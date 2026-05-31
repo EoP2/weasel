@@ -1,12 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - '*'
-    tags:
-      - '[0-9]+.*'
-  pull_request:
   workflow_dispatch:
 
 jobs:
@@ -39,9 +33,6 @@ jobs:
       boost_version: 1.84.0
       BOOST_ROOT: ${{ github.workspace }}\deps\boost_1_84_0
       SDKVER: 10.0.19041.0
-    strategy:
-      matrix:
-        variant: [msbuild, xmake]
     steps:
       - name: Checkout last commit
         uses: actions/checkout@v4
@@ -128,10 +119,6 @@ jobs:
           $ErrorActionPreference = 'Stop'
           .\build.bat data
 
-      - name: Setup xmake
-        if: matrix.variant == 'xmake'
-        uses: xmake-io/github-action-setup-xmake@v1
-
       - name: Build Weasel
         shell: pwsh
         id: build_weasel
@@ -139,53 +126,12 @@ jobs:
           RELEASE_BUILD: ${{ (github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/')) && '1' || '' }}
         run: |
           $ErrorActionPreference = 'Stop'
-          if ('${{ matrix.variant }}' -eq 'msbuild') {
-            .\build.bat arm64 installer
-          } else {
-            .\xbuild.bat arm64 installer
-          }
-
-      - name: Compress Debug Symbols
-        if: matrix.variant == 'msbuild'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          output\7z.exe a -t7z "./output/archives/debug_symbols.7z" "output/*.pdb" -r
+          .\build.bat arm64 installer
 
       - name: Upload artifacts
-        if: matrix.variant == 'msbuild'
         uses: actions/upload-artifact@v4
         with:
           name: weasel-artifact-${{ env.git_ref_name }}
           if-no-files-found: error
           path: |
             .\output\archives\weasel*.exe
-            .\output\archives\debug_symbols.7z
-
-      # Release-only steps (run on tags or master)
-      - name: Extract changelog
-        if: ${{ github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
-        shell: pwsh
-        run: .\extract_changelog.ps1
-
-      - name: Create Nightly release
-        if: ${{ github.repository == 'rime/weasel' && github.ref == 'refs/heads/master' && matrix.variant == 'msbuild' }}
-        uses: 'marvinpinto/action-automatic-releases@latest'
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          automatic_release_tag: latest
-          prerelease: true
-          title: "Nightly Build"
-          files: |
-            ./output/archives/weasel*.exe
-            ./output/archives/debug_symbols.7z
-
-      - name: Release (stable)
-        if: ${{ github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
-        uses: softprops/action-gh-release@v2
-        with:
-          draft: true
-          files: |
-            ./output/archives/weasel*.exe
-            ./output/archives/debug_symbols.7z
-          body_path: ${{ github.workspace }}/RELEASE_CHANGELOG.md
