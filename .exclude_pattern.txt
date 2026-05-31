@@ -3,6 +3,7 @@ targetver
 resource.h
 winapifamily
 winpackagefamily
+winsparkle
 immdev.h
 SystemTraySDK.h
 ctffunc.h
