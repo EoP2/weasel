@@ -224,8 +224,6 @@ Section "Weasel"
   RMDir /r $TEMP\weasel-backup
 
 program_files:
-  File "rime-install.bat"
-  File "rime-install-config.bat"
   File "start_service.bat"
   File "stop_service.bat"
   File "weasel.dll"
