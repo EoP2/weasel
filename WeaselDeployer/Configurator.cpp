@@ -45,6 +45,7 @@ void Configurator::Initialize() {
   weasel_traits.app_name = "rime.weasel";
   std::string log_dir = WeaselLogPath().u8string();
   weasel_traits.log_dir = log_dir.c_str();
+  weasel_traits.min_log_level = 2;
   RimeApi* rime_api = rime_get_api();
   assert(rime_api);
   rime_api->setup(&weasel_traits);
