@@ -224,14 +224,6 @@ Section "Weasel"
   RMDir /r $TEMP\weasel-backup
 
 program_files:
-  File "LICENSE.txt"
-  File "README.txt"
-  File "7-zip-license.txt"
-  File "7z.dll"
-  File "7z.exe"
-  File "COPYING-curl.txt"
-  File "curl.exe"
-  File "curl-ca-bundle.crt"
   File "rime-install.bat"
   File "rime-install-config.bat"
   File "start_service.bat"
