@@ -100,6 +100,7 @@ void RimeWithWeaselHandler::_Setup() {
   weasel_traits.app_name = "rime.weasel";
   std::string log_dir = WeaselLogPath().u8string();
   weasel_traits.log_dir = log_dir.c_str();
+  weasel_traits.min_log_level = 2;
   rime_api->setup(&weasel_traits);
   rime_api->set_notification_handler(&RimeWithWeaselHandler::OnNotify, this);
 }
